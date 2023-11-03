@@ -17,6 +17,47 @@ def calculate_turnaround_waiting_time(jobs, arrival_times, burst_times): #this f
 
     return turnaround_times, waiting_times
 
+def sjf_solver(jobs, arrival_times, burst_times):
+    n = len(jobs)
+
+    # Initialize lists for waiting times and turnaround times
+    waiting_times = [0] * n
+    turnaround_times = [0] * n
+
+    #Create a copy of burst times to track remaining time
+    remaining_time = list(burst_times)
+
+    #Initialize the current time
+    current_time = 0
+
+    #Iterate through all processes
+    for _ in range(n):
+        #Initialize variables to find the next job
+        min_remaining_time = float('inf')
+        next_job = None
+
+        #Find the next job to execute
+        for i in range(n):
+            if arrival_times[i] <= current_time and remaining_time[i] < min_remaining_time:
+                min_remaining_time = remaining_time[i]
+                next_job = i
+
+        #If no job is found, move to the next time unit
+        if next_job is None:
+            current_time += 1
+            continue
+        #Calculate waiting time for the selected job
+        waiting_times[next_job] = current_time - arrival_times[next_job]
+
+        #Update current time and turnaround time for the selected job
+        current_time += burst_times[next_job]
+        turnaround_times[next_job] = waiting_times[next_job] + burst_times[next_job]
+
+        #Mark the job as completed by setting remaining time to infinity
+        remaining_time[next_job] = float('inf')
+
+    return jobs, arrival_times, burst_times, waiting_times, turnaround_times
+
 def ordinal_suffixes(j): #for ordinal suffixes 
     ordinal_suffixes = ['st', 'nd', 'rd'] + ['th'] * j
     ordinality = []
@@ -50,14 +91,14 @@ def main():
 
     print("=====================================================")        
 
-    if process == "FCFS":
-        j = int(input("Enter number of processes: "))
-        ordinal = ordinal_suffixes(j)
+    j = int(input("Enter number of processes: ")) #Improve this part by adding a try and except
+    ordinal = ordinal_suffixes(j)
 
+    if process == "FCFS":
         for i in range(j):
             job = input(f"Enter {ordinal[i+1]} job name: ")
             arrival = int(input(f"Enter arrival time for the job {job}: "))
-            burst = int(input(f"Enter burst time for {job}: "))
+            burst = int(input(f"Enter burst time for the job {job}: "))
             tupol.append((job, arrival, burst))
             
         tupol.sort(key = lambda x: x[1]) #for sorting our array "tupol"
@@ -69,19 +110,14 @@ def main():
         turnaround_times, waiting_times = calculate_turnaround_waiting_time(jobs, arrival_times, burst_times)
 
     elif process == "SJF":
-        j = int(input("Enter number of processes: "))
-        ordinal = ordinal_suffixes(j)
-
         for i in range(j):
-            job = input(f"Enter {ordinal[i+1]} job name: ")
-            arrival = int(input(f"Enter arrival time for the job {job}: "))
-            burst = int(input(f"Enter burst time for {job}: "))
-            tupol.append((job, arrival, burst))
-            
-        tupol.sort(key = lambda x: x[2])
+            jobs.append(input(f"Enter {ordinal[i+1]} job name: "))
+            arrival_times.append(int(input(f"Enter arrival time for the job {jobs[-1]}: ")))
+            burst_times.append(int(input(f"Enter burst time for the job {jobs[-1]}: ")))
 
+        jobs, arrival_times, burst_times, waiting_times, turnaround_times = sjf_solver(jobs, arrival_times, burst_times)
 
-    print("\n   Job\t|   AT\t|   BT\t|   TAT \t|   WT")
+    print("\n   Job\t|   AT\t|   BT\t|  TAT\t|   WT")
     for i in range(j):
         print(f"    {jobs[i]}\t|   {arrival_times[i]}\t|   {burst_times[i]}\t|   {turnaround_times[i]}\t|   {waiting_times[i]}")
 
