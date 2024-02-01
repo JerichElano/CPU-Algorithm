@@ -116,7 +116,12 @@ def main():
             burst_times.append(int(input(f"Enter burst time for the job {jobs[-1]}: ")))
 
         jobs, arrival_times, burst_times, waiting_times, turnaround_times = sjf_solver(jobs, arrival_times, burst_times)
-
+    #
+    elif process == "PEP":
+        for i in range(j):
+            jobs.append(input(f"Enter {ordinal[i+1]} job name: "))
+            arrival_times.append(int(input(f"Enter arrival time for the job{jobs[-1]}
+    #
     print("\n   Job\t|   AT\t|   BT\t|  TAT\t|   WT")
     for i in range(j):
         print(f"    {jobs[i]}\t|   {arrival_times[i]}\t|   {burst_times[i]}\t|   {turnaround_times[i]}\t|   {waiting_times[i]}")
